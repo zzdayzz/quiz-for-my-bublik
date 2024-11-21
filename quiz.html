@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz for my bublik <3</title>
+    <style>
+         @keyframes gradientAnimation {
+            0% {
+                background-position: 100% 0;
+            }
+            100% {
+                background-position: 0 100%;
+            }
+        }
+
+        .gradient-header {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff92f2, #4bc7ae, #ffb5f6, #697cec, #ff00e1); 
+            background-size: 400% 400%; 
+            -webkit-background-clip: text; 
+            color: transparent; 
+            animation: gradientAnimation 4s ease infinite; 
+            font-family: 'Dancing Script', cursive;  
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quiz-container {
+            background-color: white;
+            padding: 50px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            width: 600px;
+            height: 500px;
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: 25px;
+            z-index: 1;
+        }
+
+        button {
+            background-color: #ffb5f6;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 5px;
+            margin: 10px;
+            font-size: 18px;
+            font-family: 'Dancing Script', cursive;
+        }
+
+        button:hover {
+            background-color: #f36fe3;
+        }
+
+        /* Style for the message container */
+        #messageContainer {
+            font-size: 20px;
+            font-family: 'Dancing Script', cursive;
+            padding: 10px;
+            margin-top: 20px;
+            color: green;
+            border: 1px solid green;
+            border-radius: 10px;
+            background-color: #eaffea;
+            display: none; /* Initially hidden */
+        }
+
+        /* Style for the result container */
+        #resultContainer {
+            font-size: 20px;
+            font-family: 'Dancing Script', cursive;
+            padding: 30px;
+            margin-top: 20px;
+            color: #ff00e1;
+            border: 2px solid #ff00e1;
+            border-radius: 10px;
+            background-color: #f4f4f9;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Style for the letter background */
+        .letter-background {
+            padding: 20px;
+            background-color: #ff92f2;
+            border-radius: 10px;
+            font-size: 22px;
+            border: 2px solid #ff00e1;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Heart animation */
+        .falling-heart {
+            position: absolute;
+            top: -50px;
+            font-size: 50px;
+            animation: fall 3s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes fall {
+            0% {
+                top: -50px;
+                opacity: 1;
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+            }
+        }
+
+        /* Heart appearance delay */
+        .heart:nth-child(odd) {
+            animation-duration: 4s;
+        }
+
+        .heart:nth-child(even) {
+            animation-duration: 5s;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h2 class="gradient-header">Quiz for my bublik <3</h2>
+        <p id="question">Loading question...</p>
+        <div id="choices"></div>
+        <div id="messageContainer"></div> <!-- Message container to show results -->
+        <button id="nextButton" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+    <div id="resultContainer">
+        <div class="letter-background">
+            <p id="resultMessage"></p>
+            <p>No matter your answers, you're always a winner in my heart! 💖</p>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "What's my favorite flower?",
+                options: ["peonies", "roses", "any flowers from you"],
+                answer: "any flowers from you"
+            },
+            {
+                question: "What was the first meal we had together?",
+                options: ["besh", "khachapuri", "pasta"],
+                answer: "besh"
+            },
+            {
+                question: "What's my favorite color?",
+                options: ["blue", "pink", "orange"],
+                answer: "pink"
+            },
+            {
+                question: "What’s the nickname I call you the most?",
+                options: ["sladkiy", "kakashka", "bulochka"],
+                answer: "sladkiy"
+            },
+            {
+                question: "What’s a song that reminds us of each other?",
+                options: ["Careless Whisper", "Can't Take My Eyes Off You", "both of them"],
+                answer: "both of them"
+            },
+            {
+                question: "What’s my favorite dessert?",
+                options: ["chocolate-covered strawberries", "cheesecake", "cookies"],
+                answer: "chocolate-covered strawberries"
+            },
+            {
+                question: "What’s one thing I always order at a restaurant?",
+                options: ["tea", "chai", "TEEEAAA!!!"],
+                answer: "TEEEAAA!!!"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+
+        function loadQuestion(index) {
+            const questionElement = document.getElementById('question');
+            const choicesElement = document.getElementById('choices');
+            const nextButton = document.getElementById('nextButton');
+            const messageContainer = document.getElementById('messageContainer');
+
+            // Clear previous choices
+            choicesElement.innerHTML = '';
+            messageContainer.style.display = 'none'; // Hide the message container initially
+
+            const question = questions[index];
+            questionElement.innerText = question.question;
+
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.innerText = option;
+                button.onclick = function() {
+                    if (option === question.answer) {
+                        correctAnswers++; // Increment the correct answers count
+                        messageContainer.textContent = "Correct answer, my bublik! 😊";
+                    } else {
+                        messageContainer.textContent = "Oopsie! Incorrect, bublik! 🥺";
+                    }
+                    messageContainer.style.display = 'block'; // Show the message container
+                    nextButton.style.display = 'inline'; 
+                };
+                choicesElement.appendChild(button);
+            });
+
+            nextButton.style.display = 'none'; // Hide the next button until an answer is chosen
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion(currentQuestionIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const resultMessage = document.getElementById('resultMessage');
+            const resultContainer = document.getElementById('resultContainer');
+            resultMessage.innerHTML = `You got <strong>${correctAnswers}</strong> out of ${questions.length} correct answers! 💖`;
+            resultContainer.style.display = 'block'; // Show the result container
+
+            // Start the falling hearts animation
+            createFallingHearts();
+        }
+
+        function createFallingHearts() {
+            for (let i = 0; i < 50; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('falling-heart');
+                heart.innerHTML = '❤️';
+                heart.style.left = `${Math.random() * 100}vw`;
+                heart.style.animationDelay = `${Math.random() * 2}s`;
+
+                document.body.appendChild(heart);
+
+                // Remove the heart after it falls
+                setTimeout(() => {
+                    heart.remove();
+                }, 5000); // Remove the heart after 5 seconds
+            }
+        }
+
+        // Load the first question when the page is loaded
+        window.onload = function() {
+            loadQuestion(currentQuestionIndex);
+        };
+    </script>
+</body>
+</html>
